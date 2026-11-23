@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Case Study: Sephora &amp; Sincerely Yours (v4)</title>
+    <style>
+        :root {
+            --primary: #d81b60;
+            --primary-dark: #ad1457;
+            --primary-light: #fce4ec;
+            --secondary: #1e293b;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #334155;
+            --border: #e2e8f0;
+            --success: #10b981;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding-bottom: 4rem;
+        }
+        header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            border-bottom: 4px solid var(--primary);
+        }
+        header .badge {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.3rem 0.8rem;
+            border-radius: 999px;
+            margin-bottom: 0.75rem;
+        }
+        header h1 {
+            font-size: 1.75rem;
+            max-width: 820px;
+            margin: 0 auto 0.75rem;
+        }
+        header a {
+            color: #f472b6;
+            text-decoration: none;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+        header a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 920px;
+            margin: 2rem auto;
+            padding: 0 1.25rem;
+        }
+        .student-bar {
+            background: var(--card-bg);
+            padding: 1.25rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        .student-bar input {
+            padding: 0.6rem 0.9rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            flex: 1;
+            min-width: 190px;
+        }
+        .progress-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .progress-bar {
+            width: 140px;
+            height: 10px;
+            background: var(--border);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--success);
+            transition: width 0.3s ease;
+        }
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .tab-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 0.65rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--secondary);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .tab-btn:hover {
+            border-color: var(--primary);
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .tab-btn .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #cbd5e1;
+        }
+        .tab-btn.completed .status-dot {
+            background: var(--success);
+        }
+        .tab-btn.active.completed .status-dot {
+            background: #a7f3d0;
+        }
+        .section-card {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            animation: fadeIn 0.25s ease;
+        }
+        .section-card.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .subtopic-label {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 1.25rem;
+        }
+        .hint-box {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 0.9rem 1.1rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1.25rem;
+            font-size: 0.92rem;
+        }
+        .hint-toggle {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-bottom: 0.4rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .hint-content {
+            display: none;
+            margin-top: 0.5rem;
+            color: #475569;
+        }
+        .hint-content.show {
+            display: block;
+        }
+        .hint-content ul {
+            margin-left: 1.25rem;
+            margin-top: 0.35rem;
+        }
+        .checklist-box {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.9rem 1.1rem;
+            margin-bottom: 1.15rem;
+        }
+        .checklist-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+        .checklist-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem 1.25rem;
+        }
+        .checklist-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.88rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        textarea {
+            width: 100%;
+            min-height: 170px;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            line-height: 1.5;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(216, 27, 96, 0.1);
+        }
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.6rem;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--border);
+        }
+        .btn {
+            padding: 0.65rem 1.25rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.92rem;
+            transition: opacity 0.2s, background-color 0.2s;
+        }
+        .btn:hover {
+            opacity: 0.92;
+        }
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--secondary);
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-export {
+            background: var(--secondary);
+            color: white;
+        }
+        .actions-footer {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .footer-group {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: var(--secondary);
+            color: white;
+            padding: 0.75rem 1.1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            pointer-events: none;
+            z-index: 999;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        @media print {
+            .tabs, .nav-buttons, .actions-footer, .hint-toggle, .toast { display: none !important; }
+            .section-card { display: block !important; box-shadow: none; margin-bottom: 1.5rem; break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="badge">Case Study</div>
+    <h1>Sephora Targets Teen Skin-Care Shoppers With New Brand <em>Sincerely Yours</em></h1>
+    <p>
+        <a href="https://fashionista.com/2025/09/sincerely-yours-teen-skin-care-brand-jordan-salish-matter-sephora-launch#gid=ci0304a11d7000248a&pid=sincerely-yours-hit-refresh-serum-mist" target="_blank" rel="noopener noreferrer">
+            Read Source Article on Fashionista &nearr;
+        </a>
+    </p>
+</header>
+
+<div class="container">
+    <!-- Student Info & Progress -->
+    <div class="student-bar">
+        <input type="text" id="studentName" placeholder="Enter your full name..." oninput="saveData()">
+        <input type="text" id="studentId" placeholder="Student ID / Group (optional)" oninput="saveData()">
+        <div class="progress-wrapper">
+            <span id="progressText">0 / 6 Completed</span>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subtopic Navigation Tabs -->
+    <div class="tabs" id="tabContainer">
+        <button class="tab-btn active" onclick="showTab(0)"><span class="status-dot"></span>Question 1</button>
+        <button class="tab-btn" onclick="showTab(1)"><span class="status-dot"></span>Question 2</button>
+        <button class="tab-btn" onclick="showTab(2)"><span class="status-dot"></span>Question 3</button>
+        <button class="tab-btn" onclick="showTab(3)"><span class="status-dot"></span>Question 4</button>
+        <button class="tab-btn" onclick="showTab(4)"><span class="status-dot"></span>Question 5</button>
+        <button class="tab-btn" onclick="showTab(5)"><span class="status-dot"></span>Question 6</button>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="section-card active" data-index="0">
+        <div class="subtopic-label">Question 1</div>
+        <div class="question-text">How might Sephora and the Matter family define media planning for the “Sincerely Yours” launch, given that the brand is deeply rooted in teen content creation and YouTube?</div>
+        <div class="hint-box">
+            <button class="hint-toggle" onclick="toggleHint(0)">&#128161; Show Study Prompts &amp; Key Angles</button>
+            <div class="hint-content" id="hint-0">
+                Consider how traditional paid media merges with creator-led organic ecosystems:
+                <ul>
+                    <li>Balancing owned/earned YouTube storytelling (Salish &amp; Jordan Matter) with paid retail amplification.</li>
+                    <li>Defining media planning as orchestrating authentic community engagement rather than one-way broadcast advertising.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="checklist-box">
+            <div class="checklist-title">Self-Check Points Addressed</div>
+            <div class="checklist-items">
+                <label class="checklist-item"><input type="checkbox" class="chk-0" onchange="saveData()"> Creator/YouTube roots</label>
+                <label class="checklist-item"><input type="checkbox" class="chk-0" onchange="saveData()"> Owned + paid media balance</label>
+                <label class="checklist-item"><input type="checkbox" class="chk-0" onchange="saveData()"> Community-first approach</label>
+            </div>
+        </div>
+        <textarea id="ans-0" placeholder="Type your analysis here..." oninput="handleInput(0)"></textarea>
+        <div class="meta-row">
+            <span id="words-0">0 words</span>
+            <span>Auto-saved locally</span>
+        </div>
+        <div class="nav-buttons">
+            <span></span>
+            <button class="btn btn-primary" onclick="showTab(1)">Next Question &rarr;</button>
+        </div>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="section-card" data-index="1">
+        <div class="subtopic-label">Question 2</div>
+        <div class="question-text">What is the strategic purpose of Sephora’s media plan for Sincerely Yours — what are they trying to achieve with a teen-focused, affordable skincare line?</div>
+        <div class="hint-box">
+            <button class="hint-toggle" onclick="toggleHint(1)">&#128161; Show Study Prompts &amp; Key Angles</button>
+            <div class="hint-content" id="hint-1">
+                Think about Sephora's broader business goals and category challenges:
+                <ul>
+                    <li>Capturing younger shoppers ("Sephora Kids") with age-appropriate, gentle, and accessible price points.</li>
+                    <li>Building early brand loyalty and lifetime customer value (LTV) while reassuring parents of product safety.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="checklist-box">
+            <div class="checklist-title">Self-Check Points Addressed</div>
+            <div class="checklist-items">
+                <label class="checklist-item"><input type="checkbox" class="chk-1" onchange="saveData()"> Age-appropriate &amp; affordable positioning</label>
+                <label class="checklist-item"><input type="checkbox" class="chk-1" onchange="saveData()"> Long-term customer loyalty</label>
+                <label class="checklist-item"><input type="checkbox" class="chk-1" onchange="saveData()"> Parent reassurance</label>
+            </div>
+        </div>
+        <textarea id="ans-1" placeholder="Type your analysis here..." oninput="handleInput(1)"></textarea>
+        <div class="meta-row">
+            <span id="words-1">0 words</span>
+            <span>Auto-saved locally</span>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="showTab(0)">&larr; Previous</button>
+            <button class="btn btn-primary" onclick="showTab(2)">Next Question &rarr;</button>
+        </div>
+    </div>
+
+    <!-- Section 3 -->
+    <div class="section-card" data-index="2">
+        <div class="subtopic-label">Question 3</div>
+        <div class="question-text">When creating a media plan for this launch, what target audience segmentation, media objectives, strategies, and budget considerations would be most critical — considering Salish’s YouTube following, teen advisory board, and Sephora’s retail strength?</div>
+        <div class="hint-box">
+            <button class="hint-toggle" onclick="toggleHint(2)">&#128161; Show Study Prompts &amp; Key Angles</button>
+            <div class="hint-content" id="hint-2">
+                Break your response into four structured pillars:
+                <ul>
+                    <li><strong>Segmentation:</strong> Primary (Gen Alpha / young teens) vs. Secondary (millennial/Gen X parents as gatekeepers/payers).</li>
+                    <li><strong>Objectives &amp; Strategies:</strong> Awareness to foot traffic/app conversion; leveraging co-creation from the teen advisory board.</li>
+                    <li><strong>Budget Allocation:</strong> Lower paid acquisition cost via Salish's built-in reach, freeing budget for in-store displays and experiential pop-ups.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="checklist-box">
+            <div class="checklist-title">Self-Check Points Addressed</div>
+            <div class="checklist-items">
+                <label class="checklist-item"><input type="checkbox" class="chk-2" onchange="saveData()"> Teen + parent segmentation</label>
+                <label class="checklist-item"><input type="checkbox" class="chk-2" onchange="saveData()"> Clear objectives &amp; strategies</label>
+                <label class="checklist-item"><input type="checkbox" class="chk-2" onchange="saveData()"> Budget &amp; retail integration</label>
+            </div>
+        </div>
+        <textarea id="ans-2" placeholder="Type your analysis here..." oninput="handleInput(2)"></textarea>
+        <div class="meta-row">
+            <span id="words-2">0 words</span>
+            <span>Auto-saved locally</span>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="showTab(1)">&larr; Previous</button>
+            <button class="btn btn-primary" onclick="showTab(3)">Next Question &rarr;</button>
+        </div>
+    </div>
+
+    <!-- Section 4 -->
+    <div class="section-card" data-index="3">
+        <div class="subtopic-label">Question 4</div>
+        <div class="question-text">Why is a media plan especially important for Sincerely Yours, a new Gen Alpha brand — what risks does it mitigate and what opportunities does it unlock?</div>
+        <div class="hint-box">
+            <button class="hint-toggle" onclick="toggleHint(3)">&#128161; Show Study Prompts &amp; Key Angles</button>
+            <div class="hint-content" id="hint-3">
+                Evaluate both sides of launching a youth-centric skincare line:
+                <ul>
+                    <li><strong>Risks Mitigated:</strong> Backlash over kids using harsh anti-aging actives, skepticism toward "influencer cash-grab" brands, and regulatory/privacy rules around marketing to minors.</li>
+                    <li><strong>Opportunities Unlocked:</strong> High viral velocity, authentic peer-to-peer advocacy, and first-mover trust in gentle teen skincare.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="checklist-box">
+            <div class="checklist-title">Self-Check Points Addressed</div>
+            <div class="checklist-items">
+                <label class="checklist-item"><input type="checkbox" class="chk-3" onchange="saveData()"> Backlash &amp; safety risks</label>
+                <label class="checklist-item"><input type="checkbox" class="chk-3" onchange="saveData()"> Youth marketing compliance</label>
+                <label class="checklist-item"><input type="checkbox" class="chk-3" onchange="saveData()"> Viral &amp; trust opportunities</label>
+            </div>
+        </div>
+        <textarea id="ans-3" placeholder="Type your analysis here..." oninput="handleInput(3)"></textarea>
+        <div class="meta-row">
+            <span id="words-3">0 words</span>
+            <span>Auto-saved locally</span>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="showTab(2)">&larr; Previous</button>
+            <button class="btn btn-primary" onclick="showTab(4)">Next Question &rarr;</button>
+        </div>
+    </div>
+
+    <!-- Section 5 -->
+    <div class="section-card" data-index="4">
+        <div class="subtopic-label">Question 5</div>
+        <div class="question-text">Using the marketing-launch cycle, what steps would the media planning team need to follow (from research to evaluation) for Sincerely Yours, and what unique data sources (e.g., teen advisory board, social followers) should they leverage?</div>
+        <div class="hint-box">
+            <button class="hint-toggle" onclick="toggleHint(4)">&#128161; Show Study Prompts &amp; Key Angles</button>
+            <div class="hint-content" id="hint-4">
+                Map the stages and match them with proprietary data:
+                <ul>
+                    <li><strong>Stages:</strong> Research &rarr; Strategy/Planning &rarr; Pre-Launch Teasing &rarr; Launch Execution &rarr; Post-Launch Evaluation &amp; Optimization.</li>
+                    <li><strong>Unique Data:</strong> Qualitative feedback from the Teen Advisory Board, YouTube audience demographics/watch-time analytics, and Sephora Beauty Insider CRM data.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="checklist-box">
+            <div class="checklist-title">Self-Check Points Addressed</div>
+            <div class="checklist-items">
+                <label class="checklist-item"><input type="checkbox" class="chk-4" onchange="saveData()"> End-to-end launch stages</label>
+                <label class="checklist-item"><input type="checkbox" class="chk-4" onchange="saveData()"> Teen advisory board insights</label>
+                <label class="checklist-item"><input type="checkbox" class="chk-4" onchange="saveData()"> Social &amp; retail analytics</label>
+            </div>
+        </div>
+        <textarea id="ans-4" placeholder="Type your analysis here..." oninput="handleInput(4)"></textarea>
+        <div class="meta-row">
+            <span id="words-4">0 words</span>
+            <span>Auto-saved locally</span>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="showTab(3)">&larr; Previous</button>
+            <button class="btn btn-primary" onclick="showTab(5)">Next Question &rarr;</button>
+        </div>
+    </div>
+
+    <!-- Section 6 -->
+    <div class="section-card" data-index="5">
+        <div class="subtopic-label">Question 6</div>
+        <div class="question-text">What principles should guide media channel selection for this teen skincare brand (e.g., relevance, reach, cost) and how do those principles apply when choosing between YouTube content, Sephora in-store experiences, social media, and PR?</div>
+        <div class="hint-box">
+            <button class="hint-toggle" onclick="toggleHint(5)">&#128161; Show Study Prompts &amp; Key Angles</button>
+            <div class="hint-content" id="hint-5">
+                Compare the four channels across Relevance, Reach, Credibility, and Cost-Efficiency:
+                <ul>
+                    <li><strong>YouTube:</strong> Deep storytelling, high trust, core discovery engine.</li>
+                    <li><strong>Short-form Social (TikTok/IG/Shorts):</strong> Viral trends, peer validation, quick product demos.</li>
+                    <li><strong>Sephora In-Store Experiences:</strong> Tactile trial, hangout appeal for teens, high conversion.</li>
+                    <li><strong>PR &amp; Earned Media:</strong> Reaches parents and beauty editors to establish clinical/dermatological credibility.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="checklist-box">
+            <div class="checklist-title">Self-Check Points Addressed</div>
+            <div class="checklist-items">
+                <label class="checklist-item"><input type="checkbox" class="chk-5" onchange="saveData()"> Selection criteria (reach, fit, cost)</label>
+                <label class="checklist-item"><input type="checkbox" class="chk-5" onchange="saveData()"> YouTube &amp; social comparison</label>
+                <label class="checklist-item"><input type="checkbox" class="chk-5" onchange="saveData()"> In-store &amp; PR roles</label>
+            </div>
+        </div>
+        <textarea id="ans-5" placeholder="Type your analysis here..." oninput="handleInput(5)"></textarea>
+        <div class="meta-row">
+            <span id="words-5">0 words</span>
+            <span>Auto-saved locally</span>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="showTab(4)">&larr; Previous</button>
+            <button class="btn btn-primary" onclick="downloadResponses()">Download My Answers (.txt)</button>
+        </div>
+    </div>
+
+    <!-- Global Footer Actions -->
+    <div class="actions-footer">
+        <button class="btn btn-secondary" onclick="clearAll()">Reset Worksheet</button>
+        <div class="footer-group">
+            <button class="btn btn-export" onclick="downloadResponses()">Export Answers (.txt)</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const totalSections = 6;
+    const questions = [
+        "1. How might Sephora and the Matter family define media planning for the 'Sincerely Yours' launch, given that the brand is deeply rooted in teen content creation and YouTube?",
+        "2. What is the strategic purpose of Sephora's media plan for Sincerely Yours — what are they trying to achieve with a teen-focused, affordable skincare line?",
+        "3. When creating a media plan for this launch, what target audience segmentation, media objectives, strategies, and budget considerations would be most critical — considering Salish's YouTube following, teen advisory board, and Sephora's retail strength?",
+        "4. Why is a media plan especially important for Sincerely Yours, a new Gen Alpha brand — what risks does it mitigate and what opportunities does it unlock?",
+        "5. Using the marketing-launch cycle, what steps would the media planning team need to follow (from research to evaluation) for Sincerely Yours, and what unique data sources (e.g., teen advisory board, social followers) should they leverage?",
+        "6. What principles should guide media channel selection for this teen skincare brand (e.g., relevance, reach, cost) and how do those principles apply when choosing between YouTube content, Sephora in-store experiences, social media, and PR?"
+    ];
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2400);
+    }
+
+    function showTab(index) {
+        const tabs = document.querySelectorAll('.tab-btn');
+        const cards = document.querySelectorAll('.section-card');
+        tabs.forEach((t, i) => t.classList.toggle('active', i === index));
+        cards.forEach((c, i) => c.classList.toggle('active', i === index));
+    }
+
+    function toggleHint(index) {
+        const hint = document.getElementById(`hint-${index}`);
+        hint.classList.toggle('show');
+    }
+
+    function countWords(str) {
+        const trimmed = str.trim();
+        return trimmed ? trimmed.split(/\s+/).length : 0;
+    }
+
+    function handleInput(index) {
+        const val = document.getElementById(`ans-${index}`).value;
+        const words = countWords(val);
+        document.getElementById(`words-${index}`).textContent = `${words} word${words === 1 ? '' : 's'}`;
+        updateProgress();
+        saveData();
+    }
+
+    function updateProgress() {
+        let completed = 0;
+        const tabs = document.querySelectorAll('.tab-btn');
+        for (let i = 0; i < totalSections; i++) {
+            const val = document.getElementById(`ans-${i}`).value.trim();
+            if (val.length >= 15) {
+                completed++;
+                tabs[i].classList.add('completed');
+            } else {
+                tabs[i].classList.remove('completed');
+            }
+        }
+        document.getElementById('progressText').textContent = `${completed} / ${totalSections} Completed`;
+        document.getElementById('progressFill').style.width = `${(completed / totalSections) * 100}%`;
+    }
+
+    function getChecklistStates() {
+        const allChecks = [];
+        for (let i = 0; i < totalSections; i++) {
+            const boxes = Array.from(document.querySelectorAll(`.chk-${i}`)).map(cb => cb.checked);
+            allChecks.push(boxes);
+        }
+        return allChecks;
+    }
+
+    function applyChecklistStates(allChecks) {
+        if (!Array.isArray(allChecks)) return;
+        for (let i = 0; i < totalSections; i++) {
+            const boxes = document.querySelectorAll(`.chk-${i}`);
+            if (Array.isArray(allChecks[i])) {
+                boxes.forEach((cb, idx) => {
+                    cb.checked = Boolean(allChecks[i][idx]);
+                });
+            }
+        }
+    }
+
+    function saveData() {
+        const data = {
+            name: document.getElementById('studentName').value,
+            id: document.getElementById('studentId').value,
+            answers: [],
+            checks: getChecklistStates()
+        };
+        for (let i = 0; i < totalSections; i++) {
+            data.answers.push(document.getElementById(`ans-${i}`).value);
+        }
+        localStorage.setItem('sincerely_yours_case_study_v4', JSON.stringify(data));
+    }
+
+    function loadData() {
+        const saved = localStorage.getItem('sincerely_yours_case_study_v4') || localStorage.getItem('sincerely_yours_case_study_v3') || localStorage.getItem('sincerely_yours_case_study_v2') || localStorage.getItem('sincerely_yours_case_study');
+        if (!saved) return;
+        try {
+            const data = JSON.parse(saved);
+            if (data.name) document.getElementById('studentName').value = data.name;
+            if (data.id) document.getElementById('studentId').value = data.id;
+            if (Array.isArray(data.answers)) {
+                data.answers.forEach((ans, i) => {
+                    if (document.getElementById(`ans-${i}`)) {
+                        document.getElementById(`ans-${i}`).value = ans;
+                        const words = countWords(ans);
+                        document.getElementById(`words-${i}`).textContent = `${words} word${words === 1 ? '' : 's'}`;
+                    }
+                });
+            }
+            if (data.checks) {
+                applyChecklistStates(data.checks);
+            }
+            updateProgress();
+        } catch (e) {
+            console.error('Error loading saved responses', e);
+        }
+    }
+
+    function clearAll() {
+        if (!confirm('Are you sure you want to clear all your answers and checklist items?')) return;
+        localStorage.removeItem('sincerely_yours_case_study_v4');
+        localStorage.removeItem('sincerely_yours_case_study_v3');
+        localStorage.removeItem('sincerely_yours_case_study_v2');
+        localStorage.removeItem('sincerely_yours_case_study');
+        document.getElementById('studentName').value = '';
+        document.getElementById('studentId').value = '';
+        for (let i = 0; i < totalSections; i++) {
+            document.getElementById(`ans-${i}`).value = '';
+            document.getElementById(`words-${i}`).textContent = '0 words';
+            document.querySelectorAll(`.chk-${i}`).forEach(cb => { cb.checked = false; });
+        }
+        updateProgress();
+        showToast('Worksheet reset');
+    }
+
+    function buildFormattedText() {
+        const name = document.getElementById('studentName').value.trim() || 'Student';
+        const id = document.getElementById('studentId').value.trim();
+        let output = `CASE STUDY SUBMISSION: Sephora & Sincerely Yours\n`;
+        output += `Student: ${name}${id ? ' (' + id + ')' : ''}\n`;
+        output += `Date: ${new Date().toLocaleDateString()}\n`;
+        output += `====================================================================\n\n`;
+
+        for (let i = 0; i < totalSections; i++) {
+            const ans = document.getElementById(`ans-${i}`).value.trim() || '[No response provided]';
+            const checkedLabels = Array.from(document.querySelectorAll(`.chk-${i}:checked`))
+                .map(cb => cb.parentElement.textContent.trim());
+            output += `${questions[i]}\n`;
+            if (checkedLabels.length) {
+                output += `Checked Points: ${checkedLabels.join(', ')}\n`;
+            }
+            output += `\nResponse:\n${ans}\n\n--------------------------------------------------------------------\n\n`;
+        }
+        return output;
+    }
+
+    function downloadResponses() {
+        const name = document.getElementById('studentName').value.trim() || 'Student';
+        const output = buildFormattedText();
+        const blob = new Blob([output], { type: 'text/plain;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `Sincerely_Yours_Case_Study_${name.replace(/\s+/g, '_')}.txt`;
+        link.click();
+        showToast('Downloaded .txt responses');
+    }
+
+    window.addEventListener('DOMContentLoaded', loadData);
+</script>
+
+</body>
+</html>
